@@ -1,0 +1,37 @@
+.app {
+  font-family: sans-serif;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+ol {
+  list-style-position: inside;
+}
+
+.choice {
+  /* border: solid black; */
+  padding: 5px 10px 5px 45px;
+  width: 500px;
+  text-align: left;
+  margin-top: 10px;
+  position: relative;
+}
+
+.choice:hover {
+  color: #4f4c4c;
+}
+
+.choice.selected {
+  color: #4f4c4c;
+}
+
+.choice.correct {
+  border: 2px solid green;
+}
+
+.choice.incorrect {
+  border: 2px solid rgb(175, 0, 0);
+  text-decoration: line-through;
+}
