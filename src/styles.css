@@ -6,8 +6,18 @@
   text-align: center;
 }
 
+.mark {
+  font-style: italic;
+}
+
 ol {
   list-style-position: inside;
+}
+
+.questions {
+  padding: 5px 10px 5px 45px;
+  width: 500px;
+  text-align: left;
 }
 
 .choice {
@@ -25,6 +35,14 @@ ol {
 
 .choice.selected {
   color: #4f4c4c;
+}
+
+span.correct {
+  color: green;
+}
+span.incorrect {
+  color: red;
+  text-decoration: line-through;
 }
 
 .choice.correct {

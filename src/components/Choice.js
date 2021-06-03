@@ -1,10 +1,19 @@
 import React from 'react';
 
-// TODO: LIFT CLASSES TO TRIGGER NEXT BUTTON
 export const Choice = (props) => {
-  // NOTE: use a CSS class to show the user which one is selected
   let classes = ['choice'];
-  if (props.selected) classes.push('selected');
+
+  if (props.isChoiceSelected) {
+    classes.push('selected');
+    if (
+      props.selected &&
+      props.currentAnswer !== props.question.correctAnswer
+    ) {
+      classes.push('incorrect');
+    } else if (props.isCorrect) {
+      classes.push('correct');
+    }
+  }
 
   return (
     <li className={classes.join(' ')} onClick={props.handleClick}>

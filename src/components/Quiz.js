@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Progress } from './Progress';
 import { Question } from './Question';
 import { Choices } from './Choices';
 import { Summary } from './Summary';
@@ -10,83 +9,75 @@ export const Quiz = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState('');
   const [answers, setAnswers] = useState([]);
-  const [error, setError] = useState('');
   const [showSummary, setShowSummary] = useState(false);
-  // TODO: CHECK IF THIS IS REDUNDANT
-  // const [isSelected, setIsSelected] = useState(false);
+  const [showNext, setShowNext] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+  const [totalCorrect, setTotalCorrect] = useState(0);
 
-  // NOTE: SHOULD THESE NOT BE HARD CODED?
-  // NOTE: IDEALLY I WOULD JUST SAY AFTER EACH QUIZ SHOW SUMMARY, THEN CLICK TO GO TO NEXT QUIZ
-  const htmlQuiz = quizzes[0];
-  const cssQuiz = quizzes[1];
+  const quiz = quizzes[currentQuiz];
+  const questions = quizzes[currentQuiz].questions;
 
-  const htmlQues = htmlQuiz.questions;
-  const cssQues = cssQuiz.questions;
-
-  // TODO: CHANGE THIS FUNCTIONALITY TO THE NEXT BUTTON INSTEAD
   const handleClick = (evt) => {
-    // TODO: HOW TO GRAB THE CLASS TO CHECK IF IT IS SELECTED
-    // console.log('QUIZ HANDLE CLICK', evt.target.class);
     setCurrentAnswer(evt.target.innerText);
-    setError('');
-  };
+    setShowNext(true);
 
-  const renderError = () => {
-    if (!error) return;
-    return <div className="error">{error}</div>;
+    if (evt.target.innerText === questions[currentQuestion].correctAnswer) {
+      setIsCorrect(true);
+      setTotalCorrect(totalCorrect + 1);
+    } else {
+      setIsCorrect(false);
+    }
   };
 
   const renderSummaryResult = (question, answer) => {
     if (question.correctAnswer === answer.currentAnswer) {
-      return <span className="correct">Correct</span>;
+      return <span className="correct">{answer.currentAnswer}</span>;
     }
-    return <span className="incorrect">Incorrect</span>;
+    return <span className="incorrect">{answer.currentAnswer}</span>;
   };
 
   const renderSummaryData = () => {
-    // NOTE: RETURNING FUNC WITH ALL DIVS
     // NOTE: INDEX IN ANSEWRS AND QUIZ QUESTIONS (HTML QUIZ) ACTS AS A UNIQUE ID FOR A QUESTION
     return answers.map((answer, index) => {
-      const question = htmlQues.find(
+      const question = questions.find(
         (question, idx) => idx === answer.questionId,
       );
       return (
-        <div key={index}>
+        <li key={index}>
           {question.text}: {renderSummaryResult(question, answer)}
-        </div>
+        </li>
       );
     });
   };
 
-  const retake = () => {
-    setCurrentQuiz(0);
+  const takeNextQuiz = () => {
+    if (currentQuiz === quizzes.length - 1) {
+      setCurrentQuiz(0);
+    } else {
+      setCurrentQuiz(currentQuiz + 1);
+    }
     setCurrentQuestion(0);
     setCurrentAnswer('');
     setAnswers([]);
     setShowSummary(false);
-  };
-
-  const takeNextQuiz = () => {
-    setCurrentQuiz(1);
+    setIsCorrect(false);
+    setTotalCorrect(0);
   };
 
   const next = () => {
     const answer = { questionId: currentQuestion, currentAnswer };
 
-    if (!currentAnswer) {
-      setError('Please select an option');
-      return;
-    }
     answers.push(answer);
     setAnswers(answers);
     setCurrentAnswer('');
+    setShowNext(false);
+    setIsCorrect(false);
 
-    if (currentQuestion + 1 < htmlQues.length) {
+    if (currentQuestion + 1 < questions.length) {
       setCurrentQuestion(currentQuestion + 1);
       return;
     }
 
-    // NOTE: if at last question show summary
     setShowSummary(true);
   };
 
@@ -94,33 +85,41 @@ export const Quiz = () => {
     return (
       <div className="container summary">
         <Summary
-          // TODO: REF SYNTAX TO AVOID REPEITION
-          retake={retake}
+          quizTitle={quiz.title}
           takeNextQuiz={takeNextQuiz}
           renderSummaryData={renderSummaryData}
+          totalQuizzes={quizzes.length}
+          currentQuiz={currentQuiz + 1}
+          totalQuestions={questions.length}
+          totalCorrect={totalCorrect}
         />
       </div>
     );
   } else {
     return (
       <div>
-        <Progress
-          totalQuizzes={quizzes.length}
-          currentQuiz={currentQuiz + 1}
-          totalQuestions={htmlQues.length}
-          currentQuestion={currentQuestion + 1}
-        />
-        <Question question={htmlQues[currentQuestion].text} />
-        {renderError()}
+        <h3>{quiz.title}</h3>
+        <Question question={questions[currentQuestion].text} />
         <Choices
-          question={htmlQues[currentQuestion]}
+          question={questions[currentQuestion]}
           currentAnswer={currentAnswer}
           handleClick={handleClick}
         />
-        {/* TODO: MAKE THIS BUTTON APPEAR AFTER CLICKING; PLACE IN IT'S OWN COMPONENT */}
-        <button className="btn btn-primary" onClick={next}>
-          Next
-        </button>
+
+        {showNext ? (
+          <div>
+            {isCorrect ? (
+              <p className="mark">Correct!</p>
+            ) : (
+              <p className="mark">Incorrect...</p>
+            )}
+            <button className="btn btn-primary" onClick={next}>
+              Next
+            </button>
+          </div>
+        ) : (
+          ''
+        )}
       </div>
     );
   }
